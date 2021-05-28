@@ -20,6 +20,13 @@ if [ -n "$RESOLUTION" ]; then
     sed -i "s/1024x768/$RESOLUTION/" /usr/local/bin/xvfb.sh
 fi
 
+if [ -n "$PROXY" ]; then
+    echo "Acquire::http::proxy \"${PROXY}\" ;" | tea -a /etc/apt/apt.conf.d/apt.conf 
+    export http_proxy="${PROXY}"
+fi
+
+service ssh start
+
 USER=${USER:-root}
 HOME=/root
 if [ "$USER" != "root" ]; then
@@ -33,6 +40,7 @@ if [ "$USER" != "root" ]; then
     echo "$USER:$PASSWORD" | chpasswd
     cp -r /root/{.config,.gtkrc-2.0,.asoundrc} ${HOME}
     chown -R $USER:$USER ${HOME}
+    usermod -aG sudo ${USER}
     [ -d "/dev/snd" ] && chgrp -R adm /dev/snd
 fi
 sed -i -e "s|%USER%|$USER|" -e "s|%HOME%|$HOME|" /etc/supervisor/conf.d/supervisord.conf

@@ -1,8 +1,8 @@
 .PHONY: build run
 
 # Default values for variables
-REPO  ?= dorowu/ubuntu-desktop-lxde-vnc
-TAG   ?= latest
+REPO  ?= nst329/docker-ubuntu-desktop-ssh-java8
+TAG   ?= focal
 # you can choose other base image versions
 IMAGE ?= ubuntu:20.04
 # IMAGE ?= nvidia/cuda:10.1-cudnn7-devel-ubuntu18.04
