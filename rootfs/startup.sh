@@ -26,6 +26,8 @@ if [ -n "$PROXY" ]; then
 fi
 
 service ssh start
+service rpcbind start
+service nfs-common start
 
 USER=${USER:-root}
 HOME=/root
