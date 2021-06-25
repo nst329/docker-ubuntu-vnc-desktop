@@ -17,15 +17,10 @@ RUN apt update \
         supervisor nginx sudo net-tools zenity xz-utils \
         dbus-x11 x11-utils alsa-utils \
         mesa-utils libgl1-mesa-dri \
-    && apt autoclean -y \
-    && apt autoremove -y \
-    && rm -rf /var/lib/apt/lists/*
-
-# install debs error if combine together
-RUN apt update \
-    && apt install -y --no-install-recommends --allow-unauthenticated \
         xvfb x11vnc \
-        vim-tiny firefox ttf-ubuntu-font-family ttf-wqy-zenhei  \
+	xsel \
+        vim-tiny firefox ttf-ubuntu-font-family fonts-takao \
+        lxde gtk2-engines-murrine gnome-themes-standard gtk2-engines-pixbuf gtk2-engines-murrine arc-theme \
     && apt autoclean -y \
     && apt autoremove -y \
     && rm -rf /var/lib/apt/lists/*
@@ -38,13 +33,6 @@ RUN apt update \
 #    && rm google-chrome-stable_current_amd64.deb \
 #    && rm -rf /var/lib/apt/lists/*
 
-RUN apt update \
-    && apt install -y --no-install-recommends --allow-unauthenticated \
-        lxde gtk2-engines-murrine gnome-themes-standard gtk2-engines-pixbuf gtk2-engines-murrine arc-theme \
-    && apt autoclean -y \
-    && apt autoremove -y \
-    && rm -rf /var/lib/apt/lists/*
-
 # Additional packages require ~600MB
 # libreoffice  pinta language-pack-zh-hant language-pack-gnome-zh-hant firefox-locale-zh-hant libreoffice-l10n-zh-tw
 
@@ -52,14 +40,6 @@ RUN apt update \
 ARG TINI_VERSION=v0.18.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /bin/tini
 RUN chmod +x /bin/tini
-
-# ffmpeg
-RUN apt update \
-    && apt install -y --no-install-recommends --allow-unauthenticated \
-        ffmpeg \
-    && rm -rf /var/lib/apt/lists/* \
-    && mkdir /usr/local/ffmpeg \
-    && ln -s /usr/bin/ffmpeg /usr/local/ffmpeg/ffmpeg
 
 # python library
 COPY rootfs/usr/local/lib/web/backend/requirements.txt /tmp/
@@ -78,7 +58,8 @@ RUN apt-get update \
 RUN apt update \
     && apt install -y gpg-agent \
     && apt install -y --no-install-recommends --allow-unauthenticated \
-        openssh-server less openjdk-8-jre sudo nfs-common \
+        ffmpeg \
+        openssh-server less openjdk-8-jre sudo nfs-common htop \
     && curl -sSL https://keys.anydesk.com/repos/DEB-GPG-KEY | apt-key add \
     && echo "deb http://deb.anydesk.com/ all main" > /etc/apt/sources.list.d/anydesk-stable.list \
     && apt update \
@@ -138,6 +119,9 @@ ENV HOME=/home/ubuntu \
     SHELL=/bin/bash \
     LANG=C \
     USER=ubuntu
+
+RUN echo "alias pbcopy='xsel --clipboard --input'" >> .bashrc
+RUN echo "alias pbpaste='xsel --clipboard --output'" >> .bashrc
 
 HEALTHCHECK --interval=30s --timeout=5s CMD curl --fail http://127.0.0.1:6079/api/health
 ENTRYPOINT ["/startup.sh"]
